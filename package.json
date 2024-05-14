@@ -1,0 +1,41 @@
+{
+  "name": "chaiaurbackend",
+  "version": "1.0.0",
+  "description": "This is a demo project to learn to create backend",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hemal-Pandyaa/Backend.git"
+  },
+  "keywords": [
+    "Backend",
+    "Web",
+    "Devlopment"
+  ],
+  "author": "Hemal Pandya",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hemal-Pandyaa/Backend/issues"
+  },
+  "homepage": "https://github.com/Hemal-Pandyaa/Backend#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.2.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.4",
+    "mongoose-aggregate-paginate-v2": "^1.0.7",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "prettier": "^3.2.5"
+  }
+}
