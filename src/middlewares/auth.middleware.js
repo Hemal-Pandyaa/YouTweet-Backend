@@ -24,7 +24,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
         req.user = user;
     } catch (error) {
-        throw new ApiError(500, error, "Error occurred while verifying JWT token");
+        throw new ApiError(500, error, "User Must logIn First");
     }
 
     next()
