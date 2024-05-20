@@ -31,7 +31,7 @@ const userSchema = new Schema(
         coverImage: {
             type: String, // From provider e.g. Cloudinary
         },
-        wathcHistory: [
+        watchHistory: [
             {
                 type: Schema.Types.ObjectId,
                 ref: "Video",

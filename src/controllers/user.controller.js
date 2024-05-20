@@ -4,6 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { deleteCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 var options = {
     httpOnly: true,
@@ -230,24 +231,24 @@ const getUser = asyncHandler(async (req, res) => {
     );
 });
 
-const updateAvatar  = asyncHandler(async (req, res) => {
+const updateAvatar = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) {
         throw new ApiError(404, "User not found");
     }
 
     const avatarLocalPath = req.file.path;
-    if(!avatarLocalPath){
+    if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar is required");
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
-    if(!avatar) {
+    if (!avatar) {
         throw new ApiError(500, "Error happened while uploading avatar");
     }
 
     const response = deleteCloudinary(user.avatar);
-    if(!response){
+    if (!response) {
         throw new ApiError(500, "Error happened while deleting old avatar");
     }
 
@@ -255,7 +256,11 @@ const updateAvatar  = asyncHandler(async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     res.status(200).json(
-        new ApiResponse(200, { avatar: avatar.url }, "Avatar updated successfully!")
+        new ApiResponse(
+            200,
+            { avatar: avatar.url },
+            "Avatar updated successfully!"
+        )
     );
 });
 
@@ -266,28 +271,138 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     }
 
     const coverImageLocalPath = req.file.path;
-    if(!coverImageLocalPath){
+    if (!coverImageLocalPath) {
         throw new ApiError(400, "Cover Image is required");
     }
 
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-    if(!coverImage) {
+    if (!coverImage) {
         throw new ApiError(500, "Error happened while uploading cover image");
     }
 
     const response = deleteCloudinary(user.coverImage);
-    if(!response){
+    if (!response) {
         throw new ApiError(500, "Error happened while deleting old coverImage");
     }
-
 
     user.coverImage = coverImage.url;
     await user.save({ validateBeforeSave: false });
 
     res.status(200).json(
-        new ApiResponse(200, { coverImage: coverImage.url }, "Cover Image updated successfully!")
+        new ApiResponse(
+            200,
+            { coverImage: coverImage.url },
+            "Cover Image updated successfully!"
+        )
     );
-})
+});
+
+const getUserProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+    console.log(username);
+    const user = await User.findOne({ username });
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const channel = await User.aggregate([
+        {
+            $match: {
+                username: username,
+            },
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "subscriber",
+                as: "Subscribers",
+            },
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "channel",
+                as: "Channels",
+            },
+        },
+        {
+            $project: {
+                _id: 1,
+                username: 1,
+                avatar: 1,
+                coverImage: 1,
+                fullName: 1,
+                Subscribers: {
+                    $size: "$Subscribers",
+                },
+                Channels: {
+                    $size: "$Channels",
+                },
+            },
+        },
+    ]);
+
+    console.log(channel);
+
+    res.status(200).json("Testing!!");
+});
+
+const getWatchHistory = asyncHandler(async (req, res) => {
+    const user = User.findById(req.user._id);
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const watchHistory = await User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id),
+            },
+        },
+        {
+            $lookup: {
+                from: "video",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                        },
+                    },
+                    {
+                        $project: {
+                            username: 1,
+                            avatar: 1,
+                            coverImage: 1,
+                            fullName: 1,
+                            owner: 1,
+                            views: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        
+    ]);
+
+    console.log(watchHistory);
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            { watchHistory },
+            "Watch History Sent Successfully!"
+        )
+    );
+});
 
 export {
     registerUser,
@@ -299,4 +414,6 @@ export {
     getUser,
     updateAvatar,
     updateCoverImage,
+    getUserProfile,
+    getWatchHistory,
 };
