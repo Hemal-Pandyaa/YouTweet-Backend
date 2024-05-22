@@ -37,7 +37,7 @@ router.route("/updateAccountDetails").patch(verifyJWT, updateAccountDetails);
 router.route("/getUser").get(verifyJWT, getUser);
 router.route("/updateCoverImage").post(verifyJWT,  upload.single("coverImage"), updateCoverImage);
 router.route("/updateAvatar").post(verifyJWT, upload.single("avatar"), updateAvatar);
-router.route("/getUserProfile/:username").post(getUserProfile);    
+router.route("/getUserProfile/:username").get(getUserProfile);    
 router.route("/getWatchHistory").get(verifyJWT, getWatchHistory);
 
 export default router;

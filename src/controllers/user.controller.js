@@ -5,6 +5,7 @@ import { deleteCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { Subscription } from "../models/subscription.model.js";
 
 var options = {
     httpOnly: true,
@@ -324,7 +325,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "channel",
-                as: "Channels",
+                as: "Subscription",
             },
         },
         {
@@ -337,16 +338,21 @@ const getUserProfile = asyncHandler(async (req, res) => {
                 Subscribers: {
                     $size: "$Subscribers",
                 },
-                Channels: {
-                    $size: "$Channels",
+                Subscription: {
+                    $size: "$Subscription",
                 },
             },
         },
     ]);
 
-    console.log(channel);
 
-    res.status(200).json("Testing!!");
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            { user, channel },
+            "User Profile Info Sent Successfully!"
+        )
+    );
 });
 
 const getWatchHistory = asyncHandler(async (req, res) => {
