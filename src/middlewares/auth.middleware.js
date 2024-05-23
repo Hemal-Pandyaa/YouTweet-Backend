@@ -16,7 +16,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
             throw new ApiError(401, "Unauthorized request", "Invalid access token");
         }
 
-        const user = await User.findById(token._id).select("-password -refrestToken");
+        const user = await User.findById(token._id).select("-password -refreshToken");
 
         if(!user){
             throw new ApiError(401, "Unauthorized request", "Invalid Access Token");
