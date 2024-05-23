@@ -375,7 +375,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     const watchHistory = await User.aggregate([
         {
             $match: {
-                _id: new mongoose.Types.ObjectId.createFromTime(req.user._id),
+                _id: req.user._id,
             },
         },
         {
