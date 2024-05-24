@@ -19,10 +19,12 @@ app.use(express.static("public"));
 import UserRouter from "./routes/user.routes.js";
 import SubscriptionRouter from "./routes/subscription.routers.js";
 import VideoRouter from "./routes/video.routers.js";
+import LikeRouter from "./routes/like.routers.js";
 
 // Router usage
 app.use("/api/v1/users", UserRouter);
 app.use("/api/v1/subscriptions", SubscriptionRouter);
 app.use("/api/v1/videos", VideoRouter);
+app.use("/api/v1/likes", LikeRouter);
 
 export default app;
