@@ -20,11 +20,13 @@ import UserRouter from "./routes/user.routes.js";
 import SubscriptionRouter from "./routes/subscription.routers.js";
 import VideoRouter from "./routes/video.routers.js";
 import LikeRouter from "./routes/like.routers.js";
+import TweetRouter from "./routes/tweet.routers.js";
 
 // Router usage
 app.use("/api/v1/users", UserRouter);
 app.use("/api/v1/subscriptions", SubscriptionRouter);
 app.use("/api/v1/videos", VideoRouter);
 app.use("/api/v1/likes", LikeRouter);
+app.use("/api/v1/tweets", TweetRouter);
 
 export default app;
