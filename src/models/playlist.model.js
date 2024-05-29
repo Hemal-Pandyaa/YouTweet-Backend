@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const playlistSchema = new Schema({
     name: {
@@ -14,12 +14,12 @@ const playlistSchema = new Schema({
     videos: [
         {
             type: Schema.Types.ObjectId,
-            ref: "Video"
-        }
+            ref: "Video",
+        },
     ],
     owner: {
         type: Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
     },
 });
 
