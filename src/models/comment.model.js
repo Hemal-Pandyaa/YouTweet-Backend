@@ -13,12 +13,6 @@ const commentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Video"
     },
-    reply: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Comment"
-        }
-    ],
-});
+}, {timestamps: true});
 
 export const Comment = mongoose.model("Comment", commentSchema);
