@@ -23,6 +23,7 @@ import LikeRouter from "./routes/like.routers.js";
 import TweetRouter from "./routes/tweet.routers.js";
 import PlaylistRouter from "./routes/playlist.routers.js";
 import CommentRouter from "./routes/comment.routers.js";
+import DashboardRouter from "./routes/dashboard.routers.js";
 
 // Router usage
 app.use("/api/v1/users", UserRouter);
@@ -32,5 +33,6 @@ app.use("/api/v1/likes", LikeRouter);
 app.use("/api/v1/tweets", TweetRouter);
 app.use("/api/v1/playlists", PlaylistRouter);
 app.use("/api/v1/comments", CommentRouter);
+app.use("/api/v1/dashboard", DashboardRouter);
 
 export default app;
