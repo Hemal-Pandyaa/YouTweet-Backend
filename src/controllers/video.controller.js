@@ -1,7 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import { Video } from "../models/video.model.js";
 import ApiError from "../utils/apiError.js";
-import ApiResponse from "../utils/ApiResponse.js";
+import ApiResponse from "../utils/apiResponse.js";
 import { deleteCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
