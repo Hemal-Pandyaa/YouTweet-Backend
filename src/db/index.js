@@ -1,8 +1,16 @@
-// api/index.js
-import app from "../app.js";
-import connectDB from "../db/index.js";
-import serverless from "serverless-http";
+import mongoose from "mongoose";
+import { DB_NAME } from "../constant.js";
+import dotenv from "dotenv";
+dotenv.config();
 
-await connectDB(); // Make sure DB is connected once
+async function connectDB(){
+    try{
+        const connectionString = process.env.DATABASE_URL + "/" + DB_NAME;
+        const connection = await mongoose.connect(connectionString);
+        console.log("MonogoDB connected successfully!!!")
+    }catch(error) {
+        console.error("MongoDb Connectino error", error)
+    }
+}
 
-export const handler = serverless(app); // Convert express app to serverless
+export default connectDB;
