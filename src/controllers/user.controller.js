@@ -26,11 +26,10 @@ async function generateAccessAndRefreshToken(userId) {
 }
 
 const registerUser = asyncHandler(async (req, res) => {
-    console.log("HEllo World ! You got here at least")
+    console.log("HEllo World ! You got here at least");
     try {
-        
         const { username, email, password, fullName } = req.body;
-    
+
         if (
             [username, email, password, fullName].some((feild) => {
                 return feild?.trim() === "" || feild == undefined;
@@ -41,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
                 "Username, email, password and fullName is required"
             );
         }
-    
+
         if (
             await User.findOne({
                 $or: [{ username }, { email }],
@@ -49,25 +48,19 @@ const registerUser = asyncHandler(async (req, res) => {
         ) {
             throw new ApiError(400, "Username or email is already registered");
         }
-    
-        const avatarLocalPath = req.files?.avatar[0]?.path;
-        let coverImageLocalPath;
-        if (
-            req.files &&
-            Array.isArray(req.files.coverImage) &&
-            req.files.coverImage.length > 0
-        ) {
-            coverImageLocalPath = req.files?.coverImage[0]?.path;
-        }
-    
-        if (!avatarLocalPath) {
+
+        const avatarBuffer = req.files?.avatar[0]?.buffer;
+        const coverImageBuffer = req.files?.coverImage?.[0]?.buffer;
+
+        if (!avatarBuffer) {
             throw new ApiError(400, "Avatar is required");
         }
-    
-        const avatar = await uploadOnCloudinary(avatarLocalPath);
-        let coverImage = await uploadOnCloudinary(coverImageLocalPath);
-    
-        console.log(coverImage, coverImageLocalPath);
+
+        const avatar = await uploadOnCloudinary(avatarBuffer, "avatars");
+        const coverImage = coverImageBuffer
+            ? await uploadOnCloudinary(coverImageBuffer, "coverImages")
+            : null;
+
         const user = await User.create({
             username,
             email,
@@ -76,36 +69,24 @@ const registerUser = asyncHandler(async (req, res) => {
             avatar: avatar?.url,
             coverImage: coverImage?.url || "",
         });
-    
+
         const userCreated = await User.findById(user._id).select(
             "-password -refreshToken"
         );
-    
+
         if (!userCreated) {
             throw new ApiError(500, "Error happened while creating new user");
         }
-    
+
         res.status(201).json(
             new ApiResponse(200, userCreated, "User created successfully!")
         );
     } catch (error) {
-        console.log(error)
-        const avatarLocalPath = req.files?.avatar[0]?.path;
-        let coverImageLocalPath;
-        if (
-            req.files &&
-            Array.isArray(req.files.coverImage) &&
-            req.files.coverImage.length > 0
-        ) {
-            coverImageLocalPath = req.files?.coverImage[0]?.path;
-        }
-
-        unlink(coverImageLocalPath);
-        unlink(avatarLocalPath);
-
-        throw new ApiError(500, "Error happend in registering process avatar and coverImage has been deleted")
+        console.log(error);
+        throw new ApiError(500, "Error happened in registration process");
     }
 });
+
 
 const logInUser = asyncHandler(async (req, res) => {
     // Get username and password from request
@@ -249,20 +230,17 @@ const updateAvatar = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User not found");
     }
 
-    const avatarLocalPath = req.file.path;
-    if (!avatarLocalPath) {
+    const avatarBuffer = req.file?.buffer;
+    if (!avatarBuffer) {
         throw new ApiError(400, "Avatar is required");
     }
 
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    const avatar = await uploadOnCloudinary(avatarBuffer, "avatars");
     if (!avatar) {
         throw new ApiError(500, "Error happened while uploading avatar");
     }
 
-    const response = deleteCloudinary(user.avatar);
-    if (!response) {
-        throw new ApiError(500, "Error happened while deleting old avatar");
-    }
+    await deleteCloudinary(user.avatar);
 
     user.avatar = avatar.url;
     await user.save({ validateBeforeSave: false });
@@ -276,26 +254,24 @@ const updateAvatar = asyncHandler(async (req, res) => {
     );
 });
 
+
 const updateCoverImage = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user._id);
     if (!user) {
         throw new ApiError(404, "User not found");
     }
 
-    const coverImageLocalPath = req.file.path;
-    if (!coverImageLocalPath) {
+    const coverImageBuffer = req.file?.buffer;
+    if (!coverImageBuffer) {
         throw new ApiError(400, "Cover Image is required");
     }
 
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    const coverImage = await uploadOnCloudinary(coverImageBuffer, "coverImages");
     if (!coverImage) {
         throw new ApiError(500, "Error happened while uploading cover image");
     }
 
-    const response = deleteCloudinary(user.coverImage);
-    if (!response) {
-        throw new ApiError(500, "Error happened while deleting old coverImage");
-    }
+    await deleteCloudinary(user.coverImage);
 
     user.coverImage = coverImage.url;
     await user.save({ validateBeforeSave: false });
@@ -308,6 +284,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
         )
     );
 });
+
 
 const getUserProfile = asyncHandler(async (req, res) => {
     const { username } = req.params;
