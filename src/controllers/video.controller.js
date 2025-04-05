@@ -4,7 +4,9 @@ import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 import { deleteCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 
+console.log("Hereee1")
 const getAllVideos = asyncHandler(async (req, res) => {
+    console.log("Retriving all videos...")
     const { limit = 10, page = 1 } = req.query;
     const skip = (page - 1) * limit;
 

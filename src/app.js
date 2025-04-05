@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 
 const app = express();
+console.log("App.js is running...")
 
 app.use(
     cors({

@@ -1,1 +1,1 @@
-export const DB_NAME = "YouTweet";
+export const DB_NAME = "WatchTube";
